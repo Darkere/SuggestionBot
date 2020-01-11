@@ -3,7 +3,7 @@ Bot for Minecraft Mod suggestions
 
 Create a new Suggestion Pool by using
 
-%newpool <name> <channelID> <channelID2>
+%newpool name channelID channelID2
   
   name = name of the pool
   
@@ -12,10 +12,12 @@ Create a new Suggestion Pool by using
   channelID2 = Channel where suggestions will be posted by users for discussion
   
 Add new suggestions by doing
-%sugg <link to mod>
+
+%sugg link_to_mod
   (only curseforge links are accepted)
   
 Enter editmode by using
+
 %editmode
 
 Adds the user as an editor and adds reactions to all current suggestions (if not already present) to approve or reject them
