@@ -72,9 +72,11 @@ public class MessageSender {
             name = name.replace("https://www.curseforge.com/minecraft/mc-mods/", "");
             name = name.replace('-', ' ');
             name = name.toUpperCase();
+            builder.setTitle(name, suggestion.url);
+        } else {
+            builder.setTitle(name);
         }
 
-        builder.setTitle(name, suggestion.url);
         if (suggestion.result.equals("TBD")) {
             builder.addField(new String(Character.toChars(0x1f44d)), Integer.toString(suggestion.yesVote), true);
             builder.addField(new String(Character.toChars(0x1f44e)), Integer.toString(suggestion.noVote), true);

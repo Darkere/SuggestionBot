@@ -7,6 +7,13 @@ import java.util.List;
 
 public class FileHandler {
 
+    public static void saveAllPools(){
+        for(SuggestionPool pool : SuggestionHandler.getAllPools().values()){
+            rewriteCurrentSuggestions(pool);
+            saveAllSuggestions(pool);
+        }
+    }
+
     public static void rewriteCurrentSuggestions(SuggestionPool pool) {
         String path = "data/" + pool.name;
         File f = new File(path + "/CurrentSuggestions.csv");

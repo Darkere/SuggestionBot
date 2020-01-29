@@ -8,6 +8,8 @@ import javax.security.auth.login.LoginException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SuggestionsBot {
     static JDA jda;
@@ -20,7 +22,8 @@ public class SuggestionsBot {
             token = br.readLine();
             br.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("NO TOKEN FOUND add a file called token with the bot token inside");
+            System.exit(0);
         }
         if (token.equals("")) {
             System.out.println("NO TOKEN FOUND add a file called token with the bot token inside");
@@ -33,7 +36,19 @@ public class SuggestionsBot {
             e.printStackTrace();
         }
         builder.addEventListeners(new MessageReceiver());
-
+        createSavingTimer();
         jda = builder.build();
+    }
+
+    private static void createSavingTimer() {
+        Timer timer = new Timer();
+        TimerTask hourlyTask = new TimerTask () {
+            @Override
+            public void run () {
+                FileHandler.saveAllPools();
+            }
+        };
+        timer.schedule (hourlyTask, 0L, 1000*60*60);
+
     }
 }

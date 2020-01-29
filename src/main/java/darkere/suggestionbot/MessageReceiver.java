@@ -20,19 +20,22 @@ public class MessageReceiver extends ListenerAdapter {
         String channelID = event.getChannel().getId();
         String messageID = event.getMessageId();
         SuggestionPool pool = SuggestionHandler.getPool(channelID);
-        if (rawMessage.startsWith("%testreaction")) {
+        if (rawMessage.equals("%testreaction")) {
             ReactionHandler.addVoteReactions(event.getMessage());
         }
         if (rawMessage.startsWith("%newpool")) {
             String[] args = rawMessage.substring(8).split(" ");
             SuggestionHandler.newPool(serverID, channelID, args);
         }
-        if (rawMessage.startsWith("%pools")) {
+        if (rawMessage.equals("%pools")) {
             StringBuilder poolnames = new StringBuilder();
             for (SuggestionPool pools : SuggestionHandler.getAllPools().values()) {
                 poolnames.append(pools.name).append(", ");
             }
             Objects.requireNonNull(SuggestionsBot.jda.getTextChannelById(channelID)).sendMessage("PoolNames:" + poolnames.toString()).queue();
+        }
+        if (rawMessage.equals("%save")){
+            FileHandler.saveAllPools();
         }
 
         reactToCommand(rawMessage, messageID, authorID, serverID, channelID, pool, event);
@@ -99,10 +102,6 @@ public class MessageReceiver extends ListenerAdapter {
                 });
                 pool.commandsToDelete.add(Long.parseLong(messageID));
                 SuggestionHandler.finishEditing(pool, authorID);
-                break;
-            }
-            case "save": {
-                FileHandler.saveAllSuggestions(pool);
                 break;
             }
             case "reject": {
