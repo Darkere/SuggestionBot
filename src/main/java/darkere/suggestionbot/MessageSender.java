@@ -83,9 +83,9 @@ public class MessageSender {
             builder.addField(new String(Character.toChars(0x1f937)), Integer.toString(suggestion.dontCare), true);
         } else {
             builder.addField(suggestion.result + " " +
-                            (suggestion.result.equals("Accepted") ? new String(Character.toChars(0x2705)) :
-                                    new String(Character.toChars(0x274c)))
-                    , "Pending", false);
+                    (suggestion.result.equals("Accepted") ? new String(Character.toChars(0x2705)) :
+                        new String(Character.toChars(0x274c)))
+                , "Pending", false);
         }
 
         builder.setDescription("[Link to Message](" + suggestion.messageLink + ")");
@@ -94,7 +94,12 @@ public class MessageSender {
     }
 
     public static void updateSuggestionMessage(SuggestionPool pool, long messageID) {
-        pool.getSuggestionChannel().editMessageById(messageID, buildEmbedForSuggestion(pool.currentSuggestions.get(messageID))).queue();
+        try {
+            pool.getSuggestionChannel().editMessageById(messageID, buildEmbedForSuggestion(pool.currentSuggestions.get(messageID))).queue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void removeMessagesInBulk(SuggestionPool pool, List<Long> ids) {
@@ -102,24 +107,19 @@ public class MessageSender {
         for (Long id : ids) {
             list.add(Long.toString(id));
         }
-        if (list.size() == 1) {
-            pool.getSuggestionChannel().deleteMessageById(list.get(0)).queue();
-        } else {
-            pool.getSuggestionChannel().deleteMessagesByIds(list).queue();
+        try {
+            if (list.size() == 1) {
+                pool.getSuggestionChannel().deleteMessageById(list.get(0)).queue();
+            } else {
+                pool.getSuggestionChannel().deleteMessagesByIds(list).queue();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
     }
 
-    public static void sendFileMessage(SuggestionPool pool, List<Suggestion> acc, List<Suggestion> deny) {
-        File Accepted = FileHandler.writeFileForSending(acc, "Accepted.csv");
-        File Denied = FileHandler.writeFileForSending(deny, "Rejected.csv");
-        MessageBuilder builder = new MessageBuilder();
-        builder.append("Finished Editing!");
-        builder.append("\n");
-        builder.append("These mods have been Accepted/Rejected");
-        MessageAction action = pool.getCommandChannel().sendMessage(builder.build());
-        if (Accepted != null) action = action.addFile(Accepted);
-        if (Denied != null) action = action.addFile(Denied);
-        action.queue();
+    public static void sendTextMessageToCommand(SuggestionPool pool,String message) {
+        pool.getCommandChannel().sendMessage(message).queue();
     }
 }

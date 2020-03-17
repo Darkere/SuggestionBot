@@ -35,7 +35,7 @@ public class SuggestionHandler {
         return false;
     }
 
-    public static Map.Entry<Long, Suggestion> findSuggestion(String url, Map<Long, Suggestion> suggestions) {
+    static Map.Entry<Long, Suggestion> findSuggestion(String url, Map<Long, Suggestion> suggestions) {
         for (Map.Entry<Long, Suggestion> entry : suggestions.entrySet()) {
             if (entry.getValue().url.equals(url)) {
                 return entry;
@@ -61,26 +61,19 @@ public class SuggestionHandler {
         if (!pool.editors.contains(authorID)) return;
         pool.isInEditMode = false;
         if (pool.pendingSuggestions.isEmpty()) return;
-
-        List<Suggestion> acc = new ArrayList<>();
-        List<Suggestion> deny = new ArrayList<>();
+        int size = pool.pendingSuggestions.size();
         for (long id : pool.pendingSuggestions) {
-            Suggestion sugg = pool.currentSuggestions.get(id);
-            if (sugg.result.equals("Accepted")) {
-                acc.add(sugg);
-            } else {
-                deny.add(sugg);
-            }
             pool.currentSuggestions.remove(id);
         }
-        MessageSender.sendFileMessage(pool, acc, deny);
-        ReactionHandler.removeEditingReactions(pool);
-        pool.pendingSuggestions.addAll(pool.commandsToDelete);
-        MessageSender.removeMessagesInBulk(pool, pool.pendingSuggestions);
 
-        pool.pendingSuggestions.clear();
+        pool.pendingSuggestions.addAll(pool.commandsToDelete);
         FileHandler.rewriteCurrentSuggestions(pool);
         FileHandler.saveAllSuggestions(pool);
+
+        MessageSender.removeMessagesInBulk(pool, pool.pendingSuggestions);
+        pool.pendingSuggestions.clear();
+        ReactionHandler.removeEditingReactions(pool);
+        MessageSender.sendTextMessageToCommand(pool,"Finished Editing Successfully "  + size + " Suggestions evaluated " + pool.currentSuggestions.size() + " suggestions to do");
     }
 
     public static void newPool(String serverID, String channelID, String[] args) {

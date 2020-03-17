@@ -5,7 +5,7 @@ plugins {
 
 mainClassName = 'darkere.suggestionbot.SuggestionsBot'
 
-version '1.1'
+version '1.4'
 def jdaVersion = '4.1.0_95'
 
 sourceCompatibility = targetCompatibility = 1.8

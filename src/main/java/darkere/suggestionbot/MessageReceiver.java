@@ -1,5 +1,6 @@
 package darkere.suggestionbot;
 
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
@@ -134,5 +135,14 @@ public class MessageReceiver extends ListenerAdapter {
         SuggestionPool pool = SuggestionHandler.getPool(event.getChannel().getId());
         if (pool == null) return;
         ReactionHandler.manageReaction(pool, false, event.getReactionEmote().getAsCodepoints(), event.getMessageIdLong(), event.getUserId());
+    }
+
+    @Override
+    public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
+        for(SuggestionPool pool :SuggestionHandler.getAllPools().values()){
+            if(event.getChannel().equals(pool.getSuggestionChannel())){
+                pool.currentSuggestions.remove(event.getMessageIdLong());
+            }
+        }
     }
 }

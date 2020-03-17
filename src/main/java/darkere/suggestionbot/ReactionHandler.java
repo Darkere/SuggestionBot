@@ -6,23 +6,33 @@ public class ReactionHandler {
 
 
     public static void addVoteReactions(Message message) {
-        message.addReaction("U+1f44d").queue();
-        message.addReaction("U+1f44e").queue();
-        message.addReaction("U+1f937").queue();
+        try {
+            message.addReaction("U+1f44d").queue();
+            message.addReaction("U+1f44e").queue();
+            message.addReaction("U+1f937").queue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void addEditingReactions(Message message) {
-        message.addReaction("U+2705").queue();
-        message.addReaction("U+274c").queue();
+        try {
+            message.addReaction("U+2705").queue();
+            message.addReaction("U+274c").queue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
+
     public static void manageReaction(SuggestionPool pool, boolean add, String emoteCode, long messageID, String authorID) {
         Suggestion suggestion = pool.currentSuggestions.get(messageID);
         boolean isEditor = pool.editors.contains(authorID);
         boolean isEvaluation = pool.suggestionsToReevaluate.containsKey(messageID);
-        if(isEvaluation){
+        if (isEvaluation) {
             suggestion = pool.suggestionsToReevaluate.get(messageID);
         }
-        if(suggestion == null)return;
+        if (suggestion == null) return;
         switch (emoteCode) {
             case "U+1f44d"://thumbsup
                 if (add) suggestion.yesVote++;
@@ -37,9 +47,9 @@ public class ReactionHandler {
                 else suggestion.dontCare--;
                 break;
             case "U+2705": // checkmark
-                if(isEvaluation){
+                if (isEvaluation) {
                     suggestion.result = "TBD";
-                    MessageSender.writeSuggestionToChannel(pool,suggestion);
+                    MessageSender.writeSuggestionToChannel(pool, suggestion);
                     pool.getCommandChannel().clearReactionsById(messageID).queue();
                     return;
                 }
@@ -53,7 +63,7 @@ public class ReactionHandler {
                 }
                 break;
             case "U+274c":// X
-                if(isEvaluation){
+                if (isEvaluation) {
                     pool.getCommandChannel().clearReactionsById(messageID).queue();
                     return;
                 }
@@ -73,9 +83,14 @@ public class ReactionHandler {
     }
 
     static void removeEditingReactions(SuggestionPool pool) {
+
         for (long id : pool.currentSuggestions.keySet()) {
-            pool.getSuggestionChannel().removeReactionById(id,"U+2705").queue();
-            pool.getSuggestionChannel().removeReactionById(id,"U+274c").queue();
+            try {
+                pool.getSuggestionChannel().removeReactionById(id, "U+2705").queue();
+                pool.getSuggestionChannel().removeReactionById(id, "U+274c").queue();
+            } catch (Exception e) {
+                System.err.println("Message " + id + " Not Found in current suggestions");
+            }
         }
     }
 }
